@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import morgan from "morgan";
 import userRoutes from "./routes/user.routes";
@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
     res.json({ message: "Backend is running 🚀" });
 });
 
