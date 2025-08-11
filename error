@@ -1,0 +1,16 @@
+| Code                          | Name                            | When to Use in Node.js + MongoDB                                                      |
+| ----------------------------- | ------------------------------- | ------------------------------------------------------------------------------------- |
+| **200 OK**                    | Success                         | A request that worked fine, e.g., `GET /users` returns data.                          |
+| **201 Created**               | Resource Created                | After inserting a new document in MongoDB (e.g., `User.create()`), respond with this. |
+| **204 No Content**            | Success, No Body                | After deleting or updating without returning content.                                 |
+| **400 Bad Request**           | Client Error                    | Invalid query params, malformed JSON, invalid MongoDB ObjectId format.                |
+| **401 Unauthorized**          | No/Invalid Auth                 | Missing or invalid JWT/token.                                                         |
+| **403 Forbidden**             | Authenticated but no permission | User is logged in but not allowed to perform the action.                              |
+| **404 Not Found**             | Resource not found              | MongoDB query returns `null` or empty.                                                |
+| **409 Conflict**              | Data conflict                   | Duplicate key error from MongoDB (e.g., `E11000 duplicate key`).                      |
+| **422 Unprocessable Entity**  | Validation failure              | Fails Mongoose validation rules.                                                      |
+| **429 Too Many Requests**     | Rate limiting                   | Too many requests from same IP/user.                                                  |
+| **500 Internal Server Error** | Unexpected server failure       | Generic fallback for unhandled exceptions.                                            |
+| **502 Bad Gateway**           | Proxy error                     | If Node is behind a reverse proxy and MongoDB connection is unavailable.              |
+| **503 Service Unavailable**   | Temporary downtime              | MongoDB down or overloaded.                                                           |
+| **504 Gateway Timeout**       | Upstream timeout                | Node waited for MongoDB but query took too long.                                      |
