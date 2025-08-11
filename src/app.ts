@@ -9,6 +9,10 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
+app.get("/", (req, res) => {
+    res.json({ message: "Backend is running 🚀" });
+});
+
 app.use("/api/users", userRoutes);
 
 export default app;
