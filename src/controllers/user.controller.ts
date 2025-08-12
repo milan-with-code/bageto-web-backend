@@ -39,7 +39,7 @@ export const loginUser = async (req: Request, res: Response) => {
             { expiresIn: "7d" }
         );
 
-        return res.status(200).json({ token });
+        return res.status(200).json({ status: 200, token });
     } catch (error) {
         res.status(500).json({ error: "Internal server error" });
     }
@@ -86,9 +86,6 @@ export const createUser = async (req: Request, res: Response) => {
                 email: newUser.email,
             },
         });
-
-
-
     } catch (error) {
         res.status(500).json({ error: "Internal server error" });
     }
