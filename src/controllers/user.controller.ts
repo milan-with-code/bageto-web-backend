@@ -39,7 +39,18 @@ export const loginUser = async (req: Request, res: Response) => {
             { expiresIn: "7d" }
         );
 
-        return res.status(200).json({ status: 200, token });
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+        return res.status(200).json({
+            status: 200,
+            message: "Login successful",
+            user: { id: user._id, email: user.email, name: user.name }
+        });
     } catch (error) {
         res.status(500).json({ error: "Internal server error" });
     }
@@ -90,3 +101,25 @@ export const createUser = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Internal server error" });
     }
 }
+export const logoutUser = (req: Request, res: Response) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict"
+    });
+    res.status(200).json({ message: "Logged out successfully" });
+};
+
+
+export const getMe = async (req: Request, res: Response) => {
+    try {
+        const token = req.cookies.token;
+        if (!token) return res.json({ user: null });
+
+        const decoded = jwt.verify(token, ENV.JWT_SECRET) as { id: string };
+        const user = await User.findById(decoded.id).select("name email");
+        res.json({ user });
+    } catch {
+        res.json({ user: null });
+    }
+};
