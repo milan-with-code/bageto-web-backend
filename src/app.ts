@@ -10,9 +10,17 @@ import cookieParser from "cookie-parser";
 const app = express();
 
 app.use(cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000" || "https://bageto.vercel.app",
+    origin: [
+        "http://localhost:3000",
+        "https://bageto.vercel.app"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
 }));
+
+app.options("*", cors());
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(morgan("dev"));
@@ -25,4 +33,5 @@ app.use("/api/users", userRoutes);
 app.use("/api/products", userProduct);
 app.use("/api/cart", userCart);
 app.use("/api/orders", userOrder);
+
 export default app;
