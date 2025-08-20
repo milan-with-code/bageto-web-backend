@@ -1,19 +1,11 @@
 import { Request, Response } from "express";
-import cloudinary from "cloudinary";
-import { ENV } from "../config/env";
-import { Product } from "../models/product.modal";
+import { Product } from "../models/product.model";
+import cloudinary from "../utils/cloudinary";
 
-
-cloudinary.v2.config({
-    cloud_name: ENV.CLOUDINARY_CLOUD_NAME,
-    api_key: ENV.CLOUDINARY_API_KEY,
-    api_secret: ENV.CLOUDINARY_API_SECRET,
-    secure: true,
-});
 
 const uploadToCloudinary = (fileBuffer: Buffer) => {
     return new Promise<string>((resolve, reject) => {
-        const stream = cloudinary.v2.uploader.upload_stream(
+        const stream = cloudinary.uploader.upload_stream(
             { folder: "products" },
             (error, result) => {
                 if (error) return reject(error);
@@ -25,49 +17,123 @@ const uploadToCloudinary = (fileBuffer: Buffer) => {
     });
 };
 
-export const getProduct = async (req: Request, res: Response) => {
+export const getAllProduct = async (req: Request, res: Response) => {
+    try {
+        const products = await Product.find();
+        res.status(200).json({
+            success: true,
+            count: products.length,
+            data: products
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch products" });
+    }
 }
 
-export const getAllProduct = async (req: Request, res: Response) => {
-
+export const getProductById = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const products = await Product.findById(id);
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch products" });
+    }
 }
 
 export const createProduct = async (req: Request, res: Response) => {
     try {
-        const { name, price, description, category, rating, reviews } = req.body;
-
-        if (!name || !price || !description || !category) {
-            return res.status(400).json({ error: "All required fields must be provided" });
-        }
-
-        let imageUrl = null;
-        if (req.file) {
-            imageUrl = await uploadToCloudinary(req.file.buffer);
-        }
-
-        const product = await Product.create({
+        const {
             name,
             price,
             description,
             category,
-            image: imageUrl,
-            rating: rating || 0,
-            reviews: reviews || 0
+            originalPrice,
+            features,
+            specifications,
+            colors,
+            sizes,
+            reviews
+        } = req.body;
+
+        if (!name || !price || !description || !category) {
+            return res.status(400).json({
+                success: false,
+                error: "All required fields (name, price, description, category) must be provided",
+            });
+        }
+
+        if (isNaN(price) || Number(price) <= 0) {
+            return res.status(400).json({
+                success: false,
+                error: "Price must be a valid positive number",
+            });
+        }
+
+        const validCategories = ["all", "bags", "wallets", "belts", "jackets", "accessories"];
+        if (!validCategories.includes(category)) {
+            return res.status(400).json({
+                success: false,
+                error: `Invalid category. Valid categories are: ${validCategories.join(", ")}`,
+            });
+        }
+
+        let imageUrls: string[] = [];
+        if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+            try {
+                for (const file of req.files) {
+                    const url = await uploadToCloudinary(file.buffer);
+                    imageUrls.push(url);
+                }
+            } catch (err) {
+                return res.status(500).json({
+                    success: false,
+                    error: "Image upload failed. Please try again.",
+                });
+            }
+        }
+        const product = await Product.create({
+            name,
+            price,
+            originalPrice: originalPrice || null,
+            description,
+            category,
+            images: imageUrls,
+            features: features || [],
+            specifications: specifications || {},
+            colors: colors || [],
+            sizes: sizes || [],
+            rating: 0,
+            reviewsCount: 0,
+            inStock: true,
+            stock: req.body.stock || 0,
+            reviews: reviews,
         });
 
-        res.status(201).json(product);
+        return res.status(201).json({
+            success: true,
+            message: "Product created successfully",
+            data: product,
+        });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
 };
 
-
 export const deleteProduct = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const product = await Product.findByIdAndDelete(id);
+        if (!product) {
+            return res.status(404).json({ error: "Product not found" });
+        }
+        res.status(200).json({ success: true, message: "Product deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to delete product" });
+    }
 
 }
 
 export const editProduct = async (req: Request, res: Response) => {
-
 }
 
 

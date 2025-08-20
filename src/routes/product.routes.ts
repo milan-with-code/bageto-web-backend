@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createProduct, deleteProduct, editProduct, getAllProduct, getProduct } from "../controllers/product.controller";
+import { createProduct, deleteProduct, editProduct, getAllProduct, getProductById } from "../controllers/product.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { upload } from "../middleware/upload.middleware";
 
@@ -9,10 +9,10 @@ const router = Router();
 router.get("/", getAllProduct);
 
 // Get a single product by ID
-router.get("/:id", getProduct);
+router.get("/:id", getProductById);
 
 // Create product
-router.post("/", authMiddleware, upload.single("image"), createProduct);
+router.post("/", authMiddleware, upload.array("images", 6), createProduct);
 
 // Edit/Update product by ID
 router.put("/:id", editProduct);

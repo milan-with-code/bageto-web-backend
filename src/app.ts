@@ -3,6 +3,8 @@ import cors from "cors";
 import morgan from "morgan";
 import userRoutes from "./routes/user.routes";
 import userProduct from "./routes/product.routes";
+import userCart from "./routes/cart.routes";
+import userOrder from "./routes/order.routes";
 import cookieParser from "cookie-parser";
 
 const app = express();
@@ -21,5 +23,6 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/api/users", userRoutes);
 app.use("/api/products", userProduct);
-
+app.use("/api/cart", userCart);
+app.use("/api/orders", userOrder);
 export default app;
