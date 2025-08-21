@@ -42,19 +42,18 @@ export const loginUser = async (req: Request, res: Response) => {
         res.cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            sameSite: "none",
             path: "/",
             maxAge: 7 * 24 * 60 * 60 * 1000,
-            domain: ".vercel.app",
         });
+
+        console.log("🍪 Token cookie set =>", token);
 
         return res.status(200).json({
             status: 200,
             message: "Login successful",
-            token,
             user: { id: user._id, email: user.email, name: user.name }
         });
-
     } catch (error) {
         res.status(500).json({ error: "Internal server error" });
     }
