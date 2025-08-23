@@ -10,13 +10,41 @@ import cookieParser from "cookie-parser";
 const app = express();
 
 app.use(cors({
-    origin: [
-        "http://localhost:3000",
-        "https://bageto.vercel.app"
-    ],
+    origin: (origin, callback) => {
+        const allowedOrigins = [
+            "http://localhost:3000",
+            "https://bageto.vercel.app"
+        ];
+
+        if (
+            !origin ||
+            allowedOrigins.includes(origin) ||
+            /\.vercel\.app$/.test(origin)
+        ) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
 }));
+
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE");
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    );
+
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(200);
+    }
+
+    next();
+});
 
 
 app.use(cookieParser());
