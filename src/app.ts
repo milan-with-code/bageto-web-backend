@@ -13,7 +13,8 @@ app.use(cors({
     origin: (origin, callback) => {
         const allowedOrigins = [
             "http://localhost:3000",
-            "https://bageto.vercel.app"
+            "https://bageto.vercel.app",
+            /\.vercel\.app$/
         ];
 
         if (
