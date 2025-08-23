@@ -20,6 +20,10 @@ app.use(cors({
 }));
 
 
+app.options("*", cors());
+
+
+
 
 app.use(cookieParser());
 app.use(express.json());
@@ -33,5 +37,11 @@ app.use("/api/users", userRoutes);
 app.use("/api/products", userProduct);
 app.use("/api/cart", userCart);
 app.use("/api/orders", userOrder);
+
+app.use((req, res, next) => {
+    console.log("👉 Incoming request:", req.method, req.url);
+    console.log("👉 Origin:", req.headers.origin);
+    next();
+});
 
 export default app;
