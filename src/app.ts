@@ -9,49 +9,28 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 
-
 app.use(cors({
-    origin: (origin, callback) => {
-        const allowedOrigins = [
-            "http://localhost:3000",
-            "https://bageto.vercel.app"
-        ];
-
-        if (
-            !origin || // allow server-to-server or curl
-            allowedOrigins.includes(origin) ||
-            /\.vercel\.app$/.test(origin) // ✅ allow all *.vercel.app
-        ) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
+    origin: [
+        "http://localhost:3000",
+        "https://bageto.vercel.app"
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
 }));
 
 
-
-app.options("*", cors());
-
 app.use(cookieParser());
 app.use(express.json());
 app.use(morgan("dev"));
-
-app.get("/", (req: Request, res: Response) => {
-    res.json({ message: "Backend is running 🚀" });
-});
 
 app.use("/api/users", userRoutes);
 app.use("/api/products", userProduct);
 app.use("/api/cart", userCart);
 app.use("/api/orders", userOrder);
 
-app.use((req, res, next) => {
-    console.log("👉 Incoming request:", req.method, req.url);
-    console.log("👉 Origin:", req.headers.origin);
-    next();
+
+app.get("/", (req: Request, res: Response) => {
+    res.json({ message: "Backend is running 🚀" });
 });
 
 export default app;
