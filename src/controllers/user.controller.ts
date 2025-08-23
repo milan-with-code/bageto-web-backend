@@ -41,11 +41,12 @@ export const loginUser = async (req: Request, res: Response) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "none",
+            secure: true, // always true if deployed on https (Render is https)
+            sameSite: "none", // must be "none" for frontend <> backend on different domains
             path: "/",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
+
 
 
 
@@ -117,31 +118,21 @@ export const logoutUser = (req: Request, res: Response) => {
 };
 
 
+// In your getMe controller
 export const getMe = async (req: Request, res: Response) => {
     try {
-        console.log("Cookies:", req.cookies);  // 👈 Debug
         const token = req.cookies.token;
-
-        if (!token) {
-            console.log("❌ No token found in cookies");
-            return res.json({ user: null });
-        }
+        if (!token) return res.json({ user: null });
 
         const decoded = jwt.verify(token, ENV.JWT_SECRET) as { id: string };
-        console.log("✅ Decoded token:", decoded);
-
         const user = await User.findById(decoded.id).select("name email");
-        if (!user) {
-            console.log("❌ No user found for id:", decoded.id);
-            return res.json({ user: null });
-        }
 
-        console.log("✅ User found:", user);
+        res.set("Cache-Control", "no-store"); // 🚀 prevent 304 cache
         res.json({ user });
-
-    } catch (err) {
-        console.error("❌ Error in getMe:", err);
-        res.json({ user: null, error: "Token verification failed" });
+    } catch {
+        res.set("Cache-Control", "no-store"); // 🚀 also here
+        res.json({ user: null });
     }
 };
+
 
