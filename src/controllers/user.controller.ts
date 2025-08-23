@@ -41,14 +41,12 @@ export const loginUser = async (req: Request, res: Response) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: true, // always true if deployed on https (Render is https)
-            sameSite: "none", // must be "none" for frontend <> backend on different domains
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "none",
+            domain: ".domain.com",
             path: "/",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
-
-
-
 
 
         console.log("🍪 Token cookie set =>", token);
