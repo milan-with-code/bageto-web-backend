@@ -11,19 +11,29 @@ const app = express();
 
 
 app.use(cors({
-    origin: [
-        "http://localhost:3000",
-        "https://bageto.vercel.app/"
-    ],
+    origin: (origin, callback) => {
+        const allowedOrigins = [
+            "http://localhost:3000",
+            "https://bageto.vercel.app"
+        ];
+
+        if (
+            !origin || // allow server-to-server or curl
+            allowedOrigins.includes(origin) ||
+            /\.vercel\.app$/.test(origin) // ✅ allow all *.vercel.app
+        ) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
 }));
 
 
+
 app.options("*", cors());
-
-
-
 
 app.use(cookieParser());
 app.use(express.json());
