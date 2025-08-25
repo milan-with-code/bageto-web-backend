@@ -5,6 +5,8 @@ import userRoutes from "./routes/user.routes";
 import userProduct from "./routes/product.routes";
 import userCart from "./routes/cart.routes";
 import userOrder from "./routes/order.routes";
+import userPayment from "./routes/payment.routes";
+import userCategory from "./routes/category.routes";
 import cookieParser from "cookie-parser";
 
 const app = express();
@@ -45,6 +47,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/products", userProduct);
 app.use("/api/cart", userCart);
 app.use("/api/orders", userOrder);
+app.use("/api/payment", userPayment);
+app.use("/api/categories", userCategory);
 
 
 app.get("/", (req: Request, res: Response) => {

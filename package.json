@@ -23,7 +23,9 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.17.1",
     "morgan": "^1.10.1",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "razorpay": "^2.9.6",
+    "short-uuid": "^5.2.0"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.9",
