@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { getAllOrders } from "../controllers/order.controller";
 
-const router = Router();;
+const router = Router();
 
 router.get("/", getAllOrders);
 

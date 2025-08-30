@@ -32,6 +32,8 @@ export interface IProduct extends Document {
     stock: number;
     colors?: string[];
     sizes?: string[];
+    isNewArrival: boolean;
+    soldCount: number;
 }
 
 const reviewSchema = new Schema<IReview>(
@@ -74,6 +76,8 @@ const productSchema = new Schema<IProduct>(
         stock: { type: Number, default: 0 },
         colors: [{ type: String }],
         sizes: [{ type: String }],
+        isNewArrival: { type: Boolean, default: false },
+        soldCount: { type: Number, default: 0 }
     },
     { timestamps: true }
 );

@@ -136,4 +136,38 @@ export const deleteProduct = async (req: Request, res: Response) => {
 export const editProduct = async (req: Request, res: Response) => {
 }
 
+export const getNewArrivals = async (req: Request, res: Response) => {
+    try {
+        const days = 30;
+        const dateThreshold = new Date();
+        dateThreshold.setDate(dateThreshold.getDate() - days);
 
+        const products = await Product.find({
+            isNewArrival: true
+        }).sort({ createdAt: -1 });
+
+
+        res.status(200).json({
+            success: true,
+            count: products.length,
+            data: products
+        });
+
+    } catch (error) {
+        console.error("Error fetching new arrivals:", error);
+        res.status(500).json({ success: false, error: "Failed to fetch new arrivals" });
+    }
+};
+
+export const getBestSellers = async (req: Request, res: Response) => {
+    try {
+        const limit = parseInt(req.query.limit as string) || 10;
+        const bestSellers = await Product.find()
+            .sort({ soldCount: -1 })
+            .limit(limit);
+
+        res.status(200).json({ success: true, data: bestSellers });
+    } catch (error) {
+        res.status(500).json({ success: false, error: "Failed to fetch best sellers" });
+    }
+};
