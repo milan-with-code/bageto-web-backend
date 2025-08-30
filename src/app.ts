@@ -48,7 +48,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/products", userProduct);
 app.use("/api/cart", userCart);
 app.use("/api/orders", userOrder);
-app.use("/api/payment", userPayment);
+// app.use("/api/payment", userPayment);
 app.use("/api/categories", userCategory);
 app.use("/api/favorites", userFavorite);
 
