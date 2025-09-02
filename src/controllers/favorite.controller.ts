@@ -49,7 +49,6 @@ export const removeFromFavorites = async (req: AuthRequest, res: Response) => {
         if (!user.favorites.includes(productId)) {
             return res.status(400).json({ message: "Product not in favorites" });
         }
-
         user.favorites = user.favorites.filter(favId => favId.toString() !== productId);
         await user.save();
         res.json({ message: "Removed from favorites", favorites: user.favorites });

@@ -13,25 +13,12 @@ import cookieParser from "cookie-parser";
 const app = express();
 
 app.use(cors({
-    origin: (origin, callback) => {
-        const allowedOrigins = [
-            "http://localhost:3000",
-            "https://bageto.vercel.app",
-            /\.vercel\.app$/
-        ];
-
-        if (
-            !origin ||
-            allowedOrigins.includes(origin) ||
-            /\.vercel\.app$/.test(origin)
-        ) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
+    origin: [
+        "http://localhost:3000",
+        "https://bageto.vercel.app"
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
+    credentials: true
 }));
 
 app.use((req, res, next) => {
@@ -48,7 +35,6 @@ app.use("/api/users", userRoutes);
 app.use("/api/products", userProduct);
 app.use("/api/cart", userCart);
 app.use("/api/orders", userOrder);
-// app.use("/api/payment", userPayment);
 app.use("/api/categories", userCategory);
 app.use("/api/favorites", userFavorite);
 

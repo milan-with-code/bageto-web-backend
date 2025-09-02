@@ -3,6 +3,7 @@ import { User } from "../models/user.model";
 import bcrypt from "bcryptjs";
 import { ENV } from "../config/env";
 import jwt from "jsonwebtoken";
+import { cookieOptions, signAccessToken, verifyToken } from "../lib/auth";
 
 export const getUsers = async (req: Request, res: Response) => {
     try {
@@ -33,24 +34,13 @@ export const loginUser = async (req: Request, res: Response) => {
             return res.status(401).json({ error: "Invalid email or password" });
         }
 
-        const token = jwt.sign(
-            { id: user._id, email: user.email },
-            ENV.JWT_SECRET,
-            { expiresIn: "7d" }
-        );
+        const token = signAccessToken({ id: user._id, email: user.email, });
 
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-            path: "/",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
-
-        return res.status(200).json({
+        res.cookie("token", token, cookieOptions);
+        res.status(200).json({
             status: 200,
             message: "Login successful",
-            user: { id: user._id, email: user.email, name: user.name }
+            user: { _id: user._id, email: user.email, name: user.name }
         });
 
     } catch (error) {
@@ -113,20 +103,18 @@ export const logoutUser = (req: Request, res: Response) => {
 };
 
 
-// In your getMe controller
 export const getMe = async (req: Request, res: Response) => {
     try {
-        const token = req.cookies.token;
-        if (!token) return res.json({ user: null });
+        const token = req.cookies?.token;
+        if (!token) return res.status(401).json({ error: "Not authenticated" });
 
-        const decoded = jwt.verify(token, ENV.JWT_SECRET) as { id: string };
-        const user = await User.findById(decoded.id).select("name email");
+        const decoded = verifyToken<{ id: string }>(token);
+        const user = await User.findById(decoded.id).select("-password");
+        if (!user) return res.status(404).json({ error: "User not found" });
 
-        res.set("Cache-Control", "no-store"); // 🚀 prevent 304 cache
-        res.json({ user });
+        res.json({ user: { _id: user._id, email: user.email, name: user.name } });
     } catch {
-        res.set("Cache-Control", "no-store"); // 🚀 also here
-        res.json({ user: null });
+        return res.status(401).json({ error: "Invalid token" });
     }
 };
 
