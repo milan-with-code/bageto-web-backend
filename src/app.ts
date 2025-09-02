@@ -17,9 +17,9 @@ app.use(cors({
         "http://localhost:3000",
         "https://bageto.vercel.app"
     ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true
+    credentials: true,
 }));
+
 
 app.use((req, res, next) => {
     res.set("Cache-Control", "no-store");

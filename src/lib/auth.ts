@@ -11,8 +11,9 @@ export function verifyToken<T = any>(token: string): T {
 
 export const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none" as const,
+    secure: process.env.NODE_ENV === "production", // true in live
+    sameSite: "none" as const, // cross-site cookie allowed
     path: "/",
-    maxAge: 1000 * 60 * 60 * 24 * 7
+    domain: ".vercel.app",
+    maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
 };
